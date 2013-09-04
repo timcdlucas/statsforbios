@@ -1,4 +1,4 @@
 statsforbios
 ============
 
-Code snippets for twitter hangle @statsforbios
+Code snippets for twitter handle @statsforbios
