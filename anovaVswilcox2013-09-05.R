@@ -45,7 +45,7 @@ dev.off()
 
 # To compare anova and wilcox test, I'll draw numbers from normal distributions and apply the test. Do this for different sample sizes and replicate.
 # What sample sizes and how many replicates of each.
-sdvec <- seq(0.2,10, by=0.4)
+sdvec <- c(seq(0.02,0.98, by=0.02), seq(1,5,by=0.2))
 reps <- 500
 
 # Empty matrices to fill
@@ -69,12 +69,12 @@ pWilcox[i,r] <- (wilcox.test(d[,1]~d[,2]))$p.value
 }
 
 #plot
-
+	
 png('anovaVsWilcox-sd.png')
 par(cex=1.3)
 plot(apply(pAnova,1,mean)~sdvec,type='l', col='Blue', xlab='Standard Deviation', ylab='p value', lwd=3, main='rnorms with mean=1 and 1.5 and n=30')
 lines(apply(pWilcox,1,mean)~sdvec,type='l', col='Red', lwd=3)
-legend('topright', inset=0.01,fill=c('Red','Blue'),legend=c('Anova', 'Wilcox'), box.lwd=2)
+legend('bottomright', inset=0.01,fill=c('Red','Blue'),legend=c('Anova', 'Wilcox'), box.lwd=2)
 box(lwd=2)
 dev.off()
 
