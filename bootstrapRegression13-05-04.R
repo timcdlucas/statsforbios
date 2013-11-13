@@ -6,6 +6,14 @@ setwd('~/Dropbox/Documents/statsforbios')
 #
 # 04/05/2013
 
+# 140 char version
+x<-1:25;y<-x+rnorm(25,0,15) 
+b<-ecdf(replicate(1000,lm(y~sample(x,25,T))$coef[2])) 
+p<-1-b(lm(y~x)$coef[2])
+
+
+
+# Fuller commented version
 
 x<-1:25;y<-x+rnorm(25,0,15) # Make data
 
