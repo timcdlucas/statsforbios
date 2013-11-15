@@ -6,6 +6,7 @@ Code snippets for twitter handle [@statsforbios](www.twitter.com/statsforbios)
 ## Statistical techniques
 
 
+
 ### totalLeastSquares2013-09-06.R 	
 Example total least squares analysis using `gx.rma` in `rgr`. Total least squares is a regression method that minimises the error in both x and y coordinates rather than just y. 
 
@@ -27,6 +28,8 @@ Example power analysis. Used to make a plot of the sample size needed for a rang
 Demonstration of `smoothScatter()` function that creates and plots a 2D kernel over a cloud of points.
 
 
+
+
 ## Programming techniques
 
 
@@ -35,10 +38,14 @@ Messing around with infix functions i.e. 2 + 2 is infix while add(2,2) is not.
 
 
 
+
+
 ## Analysis I think is interesting
 
 ### anovaVswilcox2013-09-05.R 	
 Compare power of anova and wilcox tests for a range of n, variance and difference in means.
+
+
 
 
 
