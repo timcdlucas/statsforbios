@@ -52,6 +52,8 @@ Compare power of anova and wilcox tests for a range of n, variance and differenc
 
 ## Plots for various uses 
 
+##### [stackedBarVSLines.R](Stacked bar chart alternatives)
+Comparing stacked bar charts with alternatives. Particularly lines charts. Due to this conversation on [https://twitter.com/_NickGolding_/status/407637683830140929](twitter)
 
 ##### [quantileRegressionData13-05-04.R](quantileRegressionData13-05-04.R) 	
 Just creating a plot of trangle like data that are common in ecology and a useful application of quantile regression. No quantile regression is actually run.
