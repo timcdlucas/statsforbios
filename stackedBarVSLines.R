@@ -4,7 +4,7 @@ library(ggplot2)
 library(reshape2)
 library(RColorBrewer)
 
-
+# Create some data with different shapes etc. (Don't want to artificially make it easy.)
 d <- data.frame(a = dpois(1:10, 4),
                 b = dpois(3:12, 2),
                 c = dpois(1:10, 3),
@@ -22,10 +22,10 @@ d <- data.frame(a = dpois(1:10, 4),
                 o = rep(0.001,10),
                 p = rep(0.2,10))
 
-
+# Create a pallette 
 pal <- c(brewer.pal(12, 'Set3'), brewer.pal(5, 'Paired'))
 
-
+# Convert to proportions
 proportions <- apply(d, 1, function(x) x/sum(x))
 
 
@@ -33,9 +33,10 @@ proportions <- apply(d, 1, function(x) x/sum(x))
 png('~/Dropbox/Documents/statsforbios/stackedbarvslines.png', width=1000)
 par(mfrow=c(1,2))
 
+# A stacked bar plot
 barplot(data.matrix(proportions), beside=FALSE, col=pal)
 
-
+# A line plot
 plot(proportions[1,] ~ c(1:10), col=pal[1], type='l', ylim=c(0, max(proportions)), lwd=2.3)
 for(i in 2:16){
         lines(proportions[i,] ~ c(1:10), col=pal[i], lwd=2.3)
