@@ -36,7 +36,15 @@ Demonstration of `smoothScatter()` function that creates and plots a 2D kernel o
 ##### [infixApplyFunctions2013-09-10.R](infixApplyFunctions2013-09-10.R) 
 Messing around with infix functions i.e. 2 + 2 is infix while add(2,2) is not. 
   
-  
+
+##### [juliaRegression.jl](Jula regression)
+Absolute bare bones linear regression and plotting in Julia
+
+##### [sympyExample.py](SymPy symbolic algebra)
+Very basic example of using symbolic algebra in Python with SymPy.
+
+##### [rSymPyExample.R](rSymPyExample)
+Computer algebra using SymPy in R via rSymPy.
   
   
 
