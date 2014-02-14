@@ -3,6 +3,11 @@ statsforbios
 
 Code snippets for twitter handle [@statsforbios](www.twitter.com/statsforbios)
 
+There is a [wiki](https://github.com/timcdlucas/statsforbios/wiki). Feel free to add to it. I don't really know what it's for but oh well.
+
+If you want to add some snippets or example code or whatever, clone the repo, add your files, then submit a pull requset. 
+
+
 ## Statistical techniques
 
 
