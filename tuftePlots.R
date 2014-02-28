@@ -8,6 +8,7 @@ library(ggthemes)
 setwd('~/Dropbox/Documents/statsforbios')
 
 ## Tufte style bar charts
+library(ggthemes)
 (ggplot(mtcars, aes(factor(cyl), mpg))
 + geom_tufteboxplot() +
 theme_tufte())
@@ -24,6 +25,9 @@ theme_tufte())
 (ggplot(mtcars, aes(wt, mpg))
 + geom_point() + geom_rangeframe()
 + theme_tufte())
+
+
+
 
 # Range plot with rug
 

@@ -2,7 +2,7 @@
 # 10-09-2013
 
 
-# Useful when you want the object to be foremost when reading the 
+# Useful when you want the object to be foremost when reading the code
 
 '%do%' <- function(x, FUN = round){
  out <- FUN(x)
