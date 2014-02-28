@@ -50,6 +50,10 @@ Very basic example of using symbolic algebra in Python with SymPy.
 
 ##### [rSymPyExample.R](rSymPyExample)
 Computer algebra using SymPy in R via rSymPy.
+
+##### [floatingPoint2014-2-28.R](floating point problems)
+Some examples of why floating points can be dangerous
+
   
   
 
