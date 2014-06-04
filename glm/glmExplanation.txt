@@ -1,0 +1,43 @@
+
+# Explaining GLMs 
+
+## Likelihood
+
+Time to try and explain the maths behind GLM on twitter. The plan: Likelihood -> Linear regression -> GLM.
+
+Likelihood is similar to probability. If we know the model we talk about probability of data. P(heads) = 0.5 on a fair coin. #glm
+
+If we know the data we talk about likelihood of parameters. If we see 5 heads, what's the likelihood that the coin is fair i.e. 50/50? #glm
+
+
+
+In a continuous world we talk about probability density which doesn't relate to our typical understanding of probability. #glm
+
+The probability of getting exactly 0.1 from a random number between 0 and 1 is zero, so we talk about density instead. #glm
+
+
+
+Here is the normal probability density function with mean μ and sd σ. For any x we get a probability density. #glm
+
+In this case where we know μ=0 the probability density of drawing an x value of -1 is about 0.25. #glm
+
+
+
+Now imagine we don't know the value of the mean μ but we have seen a datapoint with x=-1. #glm
+
+The likelihood that the datapoint came from a distribution with μ=0 is 0.25. Reverse logic to probability. #glm
+
+
+
+
+
+
+## Max Likelihood LM
+
+
+
+## Max likelihood Poisson LM
+
+
+
+## Link function
