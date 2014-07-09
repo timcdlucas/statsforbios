@@ -8,6 +8,9 @@ There is a [wiki](https://github.com/timcdlucas/statsforbios/wiki). Feel free to
 
 If you want to add some snippets or example code or whatever, clone the repo, add your files, then submit a pull requset. 
 
+Feel free to use, change copy anything in this repo. No accreditation needed (though it is always nice..)
+
+
 
 ## Statistical techniques
 
