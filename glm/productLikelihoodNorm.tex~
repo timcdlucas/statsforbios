@@ -1,0 +1,18 @@
+\documentclass[convert={density=400,outext=.png}]{standalone}
+\usepackage[usenames,dvipsnames]{xcolor}
+
+\usepackage{pagecolor}
+
+\definecolor{almost-white}{RGB}{255,255,254}
+
+
+
+\begin{document}
+\pagecolor{almost-white}
+
+
+$\displaystyle
+$\mathcal{L}(\beta )=\prod^n_i\frac{\beta x_i^y_ie^{-\beta x_i}}{y_i!}$
+$
+
+\end{document}

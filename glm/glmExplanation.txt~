@@ -120,7 +120,7 @@ Again switching to log likelihood makes the eqn a bit easier. But it still has t
 
 The last part of the #glm, that doesn't require much discussion is the link function.
 
-We transform the y variable. So y = βx + c + ε becomes eg log y = βx + c + ε or sqrt(y) = βx + c + ε. #glm
+
 
 
 ## Link function

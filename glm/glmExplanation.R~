@@ -396,7 +396,7 @@ plot( seq(1,5, length.out=10), seq(1,40, length.out=10), col='white', xlab = '$x
 abline(3, 1, col=p, lwd=8)
 
 
-text(3.2,3, '${\\color[HTML]{377EB8}(x,y)}$')
+text(3.3,3, '${\\color[HTML]{377EB8}(x,y)}$')
 
 
 text(5, 28, '$p({\\color[HTML]{377EB8}x} ,{\\color[HTML]{377EB8}y} )=\\frac{{\\color[HTML]{984EA3}\\beta} {\\color[HTML]{377EB8}x}^{\\color[HTML]{377EB8}y}e^{-{\\color[HTML]{984EA3}\\beta} {\\color[HTML]{377EB8}x}}}{{\\color[HTML]{377EB8}y}!}$', cex=1.5)
@@ -412,7 +412,7 @@ lines(y~xe, lwd = 6, col=r)
 
 
 points(4,4, cex=1.4, col=b, pch=16)
-arrows(4,0, 4, 4, col=b, lwd=arrowWidth*0.8, length=0.1)
+arrows(4,4+3, 4, 4, col=b, lwd=arrowWidth*0.8, length=0.1)
 arrows(4, 4, 4+dpois(4, 4+3)*6, 4, col=b, lwd=arrowWidth*0.8, length=0.1)
 
 dev.off()
@@ -440,7 +440,7 @@ plot( seq(1,5, length.out=10), seq(1,40, length.out=10), col='white', xlab = '$x
 abline(3, 1, col=p, lwd=8)
 
 
-text(3.2,3, '${\\color[HTML]{377EB8}(x,y)}$')
+text(3.3,3, '${\\color[HTML]{377EB8}(x,y)}$')
 
 
 text(5, 28, '$\\mathcal{L}({\\color[HTML]{984EA3}\\beta} )=\\prod^n_i\\frac{{\\color[HTML]{984EA3}\\beta} {\\color[HTML]{377EB8}x_i}^{\\color[HTML]{377EB8}y_i}e^{-{\\color[HTML]{984EA3}\\beta} {\\color[HTML]{377EB8}x_i}}}{{\\color[HTML]{377EB8}y_i}!}$', cex=1.5)
@@ -456,7 +456,7 @@ lines(y~xe, lwd = 6, col=r)
 
 
 points(4,4, cex=1.4, col=b, pch=16)
-arrows(4,0, 4, 4, col=b, lwd=arrowWidth*0.8, length=0.1)
+arrows(4,4+3, 4, 4, col=b, lwd=arrowWidth*0.8, length=0.1)
 arrows(4, 4, 4+dpois(4, 4+3)*6, 4, col=b, lwd=arrowWidth*0.8, length=0.1)
 
 

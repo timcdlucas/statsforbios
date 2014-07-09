@@ -1,0 +1,22 @@
+\documentclass[convert={density=400,outext=.png}]{standalone}
+\usepackage[usenames,dvipsnames]{xcolor}
+
+\usepackage{pagecolor}
+
+\definecolor{almost-white}{RGB}{255,255,254}
+
+
+
+\begin{document}
+\pagecolor{almost-white}
+
+
+$\displaystyle
+\begin{array}{lll}
+\mbox{Identity link} & \mbox{$y={\color{BlueViolet}\beta x}$}& \mbox{$\mathcal{L}(\beta )=\prod^n_i\frac{{\color{BlueViolet}\beta {x_i}}^{y_i} e^{-{\color{BlueViolet}\beta x_i}}}{y_i!}$}\\
+&&\\
+\mbox{Log link} &\mbox{$y={\color{Red}e^{\beta x}}$}& \mbox{$\mathcal{L}(\beta ) =\prod^n_i\frac{{\color{Red}e^{\beta {x_i}^{{\color{Black}y_i}}}} e^{-e^{\beta x_i}}}{y_i!}$}
+\end{array}
+$
+
+\end{document}

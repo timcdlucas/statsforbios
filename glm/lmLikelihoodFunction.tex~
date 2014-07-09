@@ -1,0 +1,18 @@
+\documentclass[convert={density=400,outext=.png}]{standalone}
+\usepackage[usenames,dvipsnames]{xcolor}
+
+\usepackage{pagecolor}
+
+\definecolor{almost-white}{RGB}{255,255,254}
+
+
+
+\begin{document}
+\pagecolor{almost-white}
+
+
+$\displaystyle
+\mathcal{L}({\color[HTML]{984EA3}\beta})=\frac{1}{\sigma \sqrt{2\pi}} e^{-\frac{({\color[HTML]{377EB8}y} - {\color[HTML]{377EB8}x}{\color[HTML]{984EA3}\beta})^2}{2\sigma^2}}
+$
+
+\end{document}
