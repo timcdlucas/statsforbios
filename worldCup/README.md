@@ -8,4 +8,4 @@ I'll try and keep the files here on git up to date.
 
 
 When do people tweet 'fuck'. I'm lacking imagination so far.
-![Alt text](/f.png?raw=true)
+![Alt text](worldCup/f.png?raw=true)
