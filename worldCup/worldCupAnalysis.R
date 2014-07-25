@@ -1,6 +1,7 @@
 library(textcat)
 library(stringi)
 library(ggplot2)
+library(dplyr)
 
 setwd('/home/tim/Dropbox/Documents/statsforbios/worldCup/')
 
@@ -56,9 +57,31 @@ fTimes <- tot$created[fLocations]
 
 fTime.str <- as.numeric(format(fTimes, "%H")) +  as.numeric(format(fTimes, "%M"))/60
 
-plot(density(fTime.str, adjust=0.2))
-density(fTimes)
+jpeg('f.jpg')
+plot(density(fTime.str-20, adjust=0.2), main='Density of "fuck"s', xlab="Time (hours relative to kickoff)")
+dev.off()
 
 
+plot(tot[fLocations, c(15,16)])
+
+
+
+
+
+
+
+mLocations <- grep('messi|Messi', tot$text)
+
+table(tot$language[mLocations])
+
+mTimes <- tot$created[mLocations]
+
+
+
+mTime.str <- as.numeric(format(mTimes, "%H")) +  as.numeric(format(mTimes, "%M"))/60
+
+#jpeg('f.jpg')
+plot(density(mTime.str-20, adjust=0.2), main='Density of "Messi"s', xlab="Time (hours relative to kickoff)")
+#dev.off()
 
 
