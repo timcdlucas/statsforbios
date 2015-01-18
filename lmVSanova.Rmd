@@ -1,6 +1,6 @@
 # Power of different linear models
 
-If you want to test for a change with a over a variable we can consider some different ways to do it.
+If you want to test for a change over a variable we can consider some different ways to do it.
 
 We can collect the data so that it is spread out along the x axis or clumped at either end.
 
