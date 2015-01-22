@@ -1,0 +1,102 @@
+
+
+# Lets look at twitter data!
+
+## Preamble: Load libs, read data
+```{r libs}
+library(ggplot2)
+library(reshape2)
+library(dplyr)
+library(magrittr)
+library(lubridate)
+```
+
+```{r readDat}
+setwd('~/Dropbox/Documents/statsforbios/twitterData')
+d <- read.csv('tweet_activity_metrics0121.csv', stringsAsFactors = FALSE)
+
+dim(d)
+names(d)
+```
+
+```{r ggplotDefaults}
+theme_set(theme_minimal(base_size = 20))
+
+```
+
+
+## Some basic time stuff
+
+Number of tweets has remained relatively constant of the period.
+
+```{r time, cache = TRUE}
+d$time %<>% as.POSIXct
+ggplot(d, aes(x = time)) +
+  geom_histogram(bin = 7*24*60*60) +
+  ylab('No. of tweets (weekly)') +
+  xlab('Date')
+```
+
+Most of my tweets are between 10 and 5 GMT. Quite a few in the evening as well.
+
+```{r timeOnly, cache = TRUE}
+d$timeOnly <- hour(d$time) + minute(d$time)/60
+
+ggplot(d, aes(x = timeOnly)) + 
+  geom_histogram() +
+  ylab('No. of tweets') +
+  xlab('Time of day')
+```
+
+
+## Time regressions
+
+Time of day is marginally significant, but not much there.
+```{r impreVtime, cache = TRUE}
+lm(d$impressions ~ d$timeOnly) %>% summary
+
+ggplot(d, aes(x = timeOnly, y = impressions)) +
+  geom_point() +
+  scale_y_sqrt()
+
+```
+However I think it's slightly better to do from 7am.
+```{r rotateTime, cache = TRUE}
+d$frmMorn <- d$timeOnly - 6
+d$frmMorn[d$frmMorn < 0] <- d$frmMorn[d$frmMorn < 0] + 24 
+
+ggplot(d, aes(x = frmMorn)) + 
+  geom_histogram()
+
+ggplot(d, aes(x = frmMorn, y = impressions)) +
+  geom_point() +
+  scale_y_sqrt() +
+  stat_smooth(method = 'lm', se = FALSE, size = 1.7, linetype = '22') + 
+  stat_smooth(method = 'glm', family = 'quasipoisson', colour = 'red4', se = FALSE, size = 1.7, linetype = '21')
+
+
+lm(d$impressions ~ d$frmMorn) %>% summary
+glm(d$impressions ~ d$frmMorn, family = 'quasipoisson') %>% summary
+```
+Linear model is no longer significant. 
+GLM is not significant. 
+I don't think there's anything here. 
+
+
+### Try removing retweets
+
+In a sense, when looking at factors such as time of day, we want to look at the number of impressions *irrespective* of how good that tweet was. 
+So
+
+
+## Pictures
+
+## Follows
+
+Not too much interesting with by looking at tweets I got follows from.
+```{r follows}
+follows <- d %>% filter(follows > 0)
+dim(follows)
+```
+
+
