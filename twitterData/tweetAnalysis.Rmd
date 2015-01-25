@@ -3,13 +3,19 @@
 # Lets look at twitter data!
 
 ## Preamble: Load libs, read data
+
+Load libraries. `lubridate` and `scales` deal with time data. `grid` allows plotting side by side `ggplot2` objects. 
 ```{r libs}
 library(ggplot2)
 library(reshape2)
 library(dplyr)
 library(magrittr)
 library(lubridate)
+library(grid)
+library(scales)
 ```
+
+Read in data downloaded from [analytics.twitter.com](analytical.twitter.com
 
 ```{r readDat}
 setwd('~/Dropbox/Documents/statsforbios/twitterData')
@@ -19,17 +25,20 @@ dim(d)
 names(d)
 ```
 
+Set `ggplot2` options.
+
 ```{r ggplotDefaults}
 theme_set(theme_minimal(base_size = 20))
 
 ```
 
 
+
 ## Some basic time stuff
 
-Number of tweets has remained relatively constant of the period.
+Number of tweets has remained relatively constant over the period.
 
-```{r time, cache = TRUE}
+```{r time}
 d$time %<>% as.POSIXct
 ggplot(d, aes(x = time)) +
   geom_histogram(bin = 7*24*60*60) +
@@ -39,20 +48,69 @@ ggplot(d, aes(x = time)) +
 
 Most of my tweets are between 10 and 5 GMT. Quite a few in the evening as well.
 
-```{r timeOnly, cache = TRUE}
+```{r timeOnly}
 d$timeOnly <- hour(d$time) + minute(d$time)/60
 
 ggplot(d, aes(x = timeOnly)) + 
   geom_histogram() +
   ylab('No. of tweets') +
-  xlab('Time of day')
+  xlab('Time (hr)')
 ```
 
+
+## Impressions exploratory analysis
+
+Another reminder of first rule of stats. Plot the data.
+
+```{r impr}
+imprPlot <- ggplot(d, aes(x = time, y = impressions)) +
+  geom_point(alpha = 0.3) +
+  scale_y_sqrt() +
+  scale_x_datetime("", labels = date_format("%b"))
+
+rtPlot <- ggplot(d, aes(x = time, y = retweets)) + 
+  geom_point(alpha = 0.3) +
+  scale_x_datetime("", labels = date_format("%b"))
+
+pushViewport(viewport(layout = grid.layout(1, 2)))
+print(imprPlot, vp = viewport(layout.pos.row = 1, layout.pos.col = 1))
+print(rtPlot, vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
+
+```
+
+Turns out this dataset has all my tweets, but only records impressions from October 2014 (when I started using twitter analytics. 
+So, any analysis on impressions must be done only on the later data. 
+Retweets are fine.
+I'm just going to remove all old tweets. 
+Seems cleaner.
+
+```{r oldOnly}
+d %<>% filter(., time > 1409150040)
+```
+
+## Replies
+
+Add a logical column of whether a tweet is a reply.
+
+```{r plotReplies}
+d$reply <- factor(substring(d$Tweet.text, 1, 1) == '@')
+
+ggplot(d, aes(y = impressions, x = reply)) +
+  geom_violin() +
+  scale_y_log10()
+```
+
+Unsurprisingly, there are much fewer impressions for replies. 
+So I'm going to remove them from further analysis as well.
+
+```{r rmReplies}
+d %<>% filter(reply == FALSE)
+```
 
 ## Time regressions
 
 Time of day is marginally significant, but not much there.
-```{r impreVtime, cache = TRUE}
+```{r impreVtime}
 lm(d$impressions ~ d$timeOnly) %>% summary
 
 ggplot(d, aes(x = timeOnly, y = impressions)) +
@@ -60,8 +118,10 @@ ggplot(d, aes(x = timeOnly, y = impressions)) +
   scale_y_sqrt()
 
 ```
-However I think it's slightly better to do from 7am.
-```{r rotateTime, cache = TRUE}
+
+However I think it's slightly better to do from 6am rather than midnight.
+
+```{r rotateTime, warning = FALSE, message = FALSE}
 d$frmMorn <- d$timeOnly - 6
 d$frmMorn[d$frmMorn < 0] <- d$frmMorn[d$frmMorn < 0] + 24 
 
@@ -78,7 +138,8 @@ ggplot(d, aes(x = frmMorn, y = impressions)) +
 lm(d$impressions ~ d$frmMorn) %>% summary
 glm(d$impressions ~ d$frmMorn, family = 'quasipoisson') %>% summary
 ```
-Linear model is no longer significant. 
+
+Linear model is not significant. 
 GLM is not significant. 
 I don't think there's anything here. 
 
@@ -86,17 +147,67 @@ I don't think there's anything here.
 ### Try removing retweets
 
 In a sense, when looking at factors such as time of day, we want to look at the number of impressions *irrespective* of how good that tweet was. 
-So
+So I'll remove the retweeted tweets and redo analysis.
+
+```{r rmRT}
+rmRT <- d %>% filter(retweets == 0)
+
+
+ggplot(rmRT, aes(x = frmMorn, y = impressions)) +
+  geom_point() +
+  scale_y_sqrt() +
+  stat_smooth(method = 'lm', se = FALSE, size = 1.7, linetype = '22') + 
+  stat_smooth(method = 'glm', family = 'quasipoisson', colour = 'red4', se = FALSE, size = 1.7, linetype = '21')
+
+
+lm(rmRT$impressions ~ rmRT$frmMorn) %>% summary
+glm(rmRT$impressions ~ rmRT$frmMorn, family = 'quasipoisson') %>% summary
+
+```
 
 
 ## Pictures
 
-## Follows
+Turns out the data doesn't indicate whether a tweet contains an image.
+There's an app [here](http://stackoverflow.com/questions/6500721/find-where-a-t-co-link-goes-to) that turns `t.co` domains back into original urls.
+Could probably use this and then `grep` for `.png`, `.jpg` etc. etc.
+But that's a pain. So for now I'm just going to use `embedded.media.clicks > 0` as a proxy for 'contains embedded media.'
+This obviously biases the number of impressions upwards.
 
-Not too much interesting with by looking at tweets I got follows from.
-```{r follows}
-follows <- d %>% filter(follows > 0)
-dim(follows)
+```{r embedMedia}
+
+ggplot(d, aes(x = embedded.media.clicks > 0, y = impressions)) +
+  geom_violin() +
+  scale_y_log10()
+
+glm(d$impressions ~ (d$embedded.media.clicks > 0), family='quasipoisson') %>% summary
 ```
+
+So while significant, the effect size isn't massive.
+Including a picture increases impressions by 50% before accounting for the bias mentioned above.
+
+## Hashtags
+
+Do hashtags affect the number of people that see my tweets? 
+I'll look at `#dataviz` and `#rstats` as these are the only hashtags I use a lot.
+
+```{r hashtags}
+ggplot(d, aes(x = grepl('#rstats', d$Tweet.text), y = impressions)) + 
+  geom_violin() + 
+  scale_y_log10() +
+  xlab('#rstats')
+
+glm(d$impressions ~ (grepl('#rstats', d$Tweet.text)), family='quasipoisson') %>% summary
+
+ggplot(d, aes(x = grepl('#dataviz', d$Tweet.text), y = impressions)) + 
+  geom_violin() + 
+  scale_y_log10() +
+  xlab('#dataviz')
+
+glm(d$impressions ~ (grepl('#dataviz', d$Tweet.text)), family='quasipoisson') %>% summary
+```
+
+So `#rstats` does not increase the number of impressions while `#dataviz` does by about 50%.
+However there's a few tweets with very large numbers of impressions that are probably driving most of the #dataviz` effect.
 
 
