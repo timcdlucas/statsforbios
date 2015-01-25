@@ -208,6 +208,6 @@ glm(d$impressions ~ (grepl('#dataviz', d$Tweet.text)), family='quasipoisson') %>
 ```
 
 So `#rstats` does not increase the number of impressions while `#dataviz` does by about 50%.
-However there's a few tweets with very large numbers of impressions that are probably driving most of the #dataviz` effect.
+However there's a few tweets with very large numbers of impressions that are probably driving most of the `#dataviz` effect.
 
 

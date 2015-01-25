@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 statsforbios
 ============
 
@@ -9,7 +8,7 @@ There is a [wiki](https://github.com/timcdlucas/statsforbios/wiki). Feel free to
 If you want to add some snippets or example code or whatever, clone the repo, add your files, then submit a pull requset. 
 
 Feel free to use, change copy anything that I have written in this repo, no accreditation needed (though it is always nice..)
-To be clear, all the R files, images that have been created by me are licensed under [The Unlicense](http://unlicense.org/). However there is some stuff in the repo such as my blog style pages and some twitter data etc. I don't own any of that.
+To be clear, all the R files, images that have been created by me are licensed under [The Unlicense](http://unlicense.org/). However there is some other stuff in the repo such as my blog style pages and some twitter data etc. I don't own any of that. The balzac jekyll theme is in this repo and is under an MIT [license](LICENSE).
 
 
 
