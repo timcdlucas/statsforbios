@@ -1,4 +1,9 @@
 
+# Custom version of heatmap.2 from gplots.
+# http://cran.r-project.org/web/packages/gplots/index.html
+# GPL-2 license
+# 
+
 library(gtools)
 
 customHeatmap <- function (x, Rowv = TRUE, Colv = if (symm) "Rowv" else TRUE, 
