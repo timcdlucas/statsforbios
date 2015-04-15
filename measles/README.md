@@ -10,3 +10,6 @@ The raw data is in [MEASLES_Incidence_1928-2003_20150409110701.csv](MEASLES_Inci
 [measlesviz.md](measlesviz.md) is my attempt at the heatmap style plot that is how I found out about this data is the first place.
 
 [measlesExtraViz.md](measlesExtraViz.md) is where I will play around with any other ideas.
+
+
+![Final image](figure/measlesTimeseries.png)
