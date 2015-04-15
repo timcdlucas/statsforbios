@@ -1,7 +1,9 @@
 This is free and unencumbered software released into the public domain.
 
 Exceptions:
-[measles/](measles/) - Data from Project Tycho and under license in file [measles/Project Tycho™ License Agreement.html](measles/Project Tycho™ License Agreement.html).
+
+[measles/](measles/) - Data from Project Tycho and under license in file [measles/Project Tycho™ License Agreement.html](http://htmlpreview.github.io/?https://github.com/timcdlucas/statsforbios/blob/master/measles/Project%20Tycho%E2%84%A2%20License%20Agreement.html).
+
 [measles/customHeatmap.R](measles/customHeatmap.R) - See license info in file.
 
 
