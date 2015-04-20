@@ -12,6 +12,8 @@ I don't want to spend the last years of my life listening to cruddy music.
 
 Anyway, you can now download all your data quite easily.
 So here I will just have a play around and see what is interesting.
+By the way, I am [t3h_m013](www.last.fm/user/t3h_m013) on last.fm.
+This is an old and embaressing nickname... but oh well.
 
 
 Read in the data
@@ -20,10 +22,11 @@ Read in the data
 First some libraries
 
 ```r
-suppressMessages(
-library(ggplot2))
+library(ggplot2)
 library(magrittr)
 library(dplyr)
+
+theme_set(theme_minimal())
 ```
 
 Then read in the data.
@@ -90,9 +93,34 @@ So let's look at some basic overview stuff.
 
 
 ```r
-#artistCounts <- table(d$
+artistCounts <- data.frame(table(d$artist.name))
+names(artistCounts)[1] <- 'Arists'
+
+artistCounts[order(artistCounts$Freq, decreasing = TRUE), ] %>% head
 ```
 
+```
+##                  Arists Freq
+## 1926       Van Morrison 5707
+## 675        Frank Turner 2789
+## 1356          Radiohead 2743
+## 1651        The Beatles 2296
+## 365  Coheed and Cambria 1819
+## 1496          Sigur Rós 1734
+```
 
+```r
+ggplot(artistCounts, aes(x = Freq)) + 
+  geom_density()
+```
+
+![plot of chunk someBasics](figure/someBasics.png) 
+
+Ok, the top artists match.
+
+![screenshot](figure/topArtistsScreen.png)
+
+
+And as expected, there's a few artists with loads of listen, and lots of artists with very few listens.
 
 
