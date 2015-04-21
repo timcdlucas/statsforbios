@@ -25,6 +25,7 @@ First some libraries
 library(ggplot2)
 library(magrittr)
 library(dplyr)
+library(lubridate)
 
 theme_set(theme_minimal())
 ```
@@ -111,7 +112,7 @@ artistCounts[order(artistCounts$Freq, decreasing = TRUE), ] %>% head
 
 ```r
 ggplot(artistCounts, aes(x = Freq)) + 
-  geom_density()
+  geom_density() 
 ```
 
 ![plot of chunk someBasics](figure/someBasics.png) 
@@ -122,5 +123,74 @@ Ok, the top artists match.
 
 
 And as expected, there's a few artists with loads of listen, and lots of artists with very few listens.
+
+Now to think of some interesting things to look at.
+
+
+
+When do I listen to music?
+---------------------------
+
+
+
+```r
+# convert to POSIXct
+d$time <- ymd_hms(d$ISO.time)
+
+
+# Through time
+ggplot(d, aes(x = time)) +
+  geom_density(adjust = 0.1) 
+```
+
+![plot of chunk times](figure/times.png) 
+
+I've had some periods where my music player didn't support scrobbling and things like that. 
+Seems I also just listened to less music back in 2005/2006. 
+I probably listened to more CDs back then.
+
+To give some overview, I was doing my undergraduate degree September 2006 - July 2010.
+Then I spent 1 year working and travelling (I'm surprised you can't see a drop in listens there.
+From 2012 I've been doing an MRes/PhD in London.
+
+
+
+```r
+# Get the time of day
+d$timeOnly <- hour(d$time) + minute(d$time)/60
+
+
+ggplot(d, aes(x = timeOnly)) +
+  geom_density(adjust = 0.001) 
+```
+
+![plot of chunk timeofday](figure/timeofday.png) 
+
+So I listen to music less at night (makes sense).
+I also listen less in the evening.
+Which I guess is me being either out or listening to music with other people and therefore not necessarily on my player.
+
+That spike is I think artificial. 
+But I can't think what it might be.
+
+
+```r
+table(d$timeOnly)[order(table(d$timeOnly), decreasing = TRUE)] %>% head
+```
+
+```
+## 
+## 10.3333333333333            14.95 15.5833333333333 14.7833333333333 
+##              593              174              154              152 
+##            15.15            14.45 
+##              150              149
+```
+
+It seems the spike is 10:20 (above is decimal I think). 
+I think this must be something server side as last.fm.
+
+
+
+
 
 
