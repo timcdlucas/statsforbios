@@ -287,7 +287,82 @@ ggplot(topScrobbles, aes(x = time, fill = artist.factor)) +
 
 Meh. Still not a big fan of stacked bar chart type things. Mebbe I should try something else.
 
+
+
+Getting into a band
+---------------------
+
+I notice with some bands that I get into them and absolutely binge.
+Other bands I listen to them, then months later I finally get into them.
+So let's look at that.
+
+
+```r
+# http://stackoverflow.com/questions/10836503/convert-difftime-time-to-years-months-and-days
+
+f <- sapply(d$artist.name, function(x) which(artistData$Artist == x))
+
+d$sinceFirst <- as.numeric(difftime( d$time , artistData$first[f], units = "days"))
+
+ggplot(d, aes(x = sinceFirst)) + 
+  geom_histogram(binwidth = 7) +
+  xlab('Days')+
+  scale_y_log10() +
+  ylab('Log Count')
+```
+
+```
+## Warning: Stacking not well defined when ymin != 0
+```
+
+![plot of chunk fromFirst](figure/fromFirst1.png) 
+
+```r
+d %>% 
+  filter(sinceFirst >= 1) %>%
+  ggplot(., aes(x = sinceFirst)) + 
+    geom_histogram(binwidth = 7) +
+    xlab('Days')
+```
+
+![plot of chunk fromFirst](figure/fromFirst2.png) 
+
+```r
+ggplot(d, aes(x = sinceFirst)) + 
+  geom_histogram(binwidth = 1) +
+  scale_x_continuous(limits = c(0, 120)) +
+  xlab('Days') +
+  ggtitle('First four months') 
+```
+
+![plot of chunk fromFirst](figure/fromFirst3.png) 
+
+```r
+d %>% 
+  filter(sinceFirst >= 1) %>%
+  ggplot(., aes(x = sinceFirst)) + 
+    geom_histogram(binwidth = 1) +
+    scale_x_continuous(limits = c(0, 120)) +
+    xlab('Days') +
+    ggtitle('First four months')
+```
+
+![plot of chunk fromFirst](figure/fromFirst4.png) 
+
+I don't know which of these is best. 
+A lot of plays are on the first day I've ever listened to that band.
+Spelling mistakes in band names could accentuate this.
+
+
+
+
 Diversity of bands listened to
 --------------------------------
+
+
+
+
+Where do bands come from
+---------------------------
 
 
