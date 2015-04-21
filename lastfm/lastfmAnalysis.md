@@ -94,14 +94,14 @@ So let's look at some basic overview stuff.
 
 
 ```r
-artistCounts <- data.frame(table(d$artist.name))
-names(artistCounts)[1] <- 'Arists'
+artistData <- data.frame(table(d$artist.name))
+names(artistData)[1] <- 'Artist'
 
-artistCounts[order(artistCounts$Freq, decreasing = TRUE), ] %>% head
+artistData[order(artistData$Freq, decreasing = TRUE), ] %>% head
 ```
 
 ```
-##                  Arists Freq
+##                  Artist Freq
 ## 1926       Van Morrison 5707
 ## 675        Frank Turner 2789
 ## 1356          Radiohead 2743
@@ -111,7 +111,7 @@ artistCounts[order(artistCounts$Freq, decreasing = TRUE), ] %>% head
 ```
 
 ```r
-ggplot(artistCounts, aes(x = Freq)) + 
+ggplot(artistData, aes(x = Freq)) + 
   geom_density() 
 ```
 
@@ -212,12 +212,12 @@ In particular I started listening to more electonic music and importantly more c
 
 
 ```r
-artistData <- d %>% 
+first <- d %>% 
   group_by(artist.name) %>% 
   select(time) %>%
   summarise(first = sort(time)[1])
 
-artistData %>% head
+first %>% head
 ```
 
 ```
@@ -233,6 +233,11 @@ artistData %>% head
 ```
 
 ```r
+# Add this data to artistData data.frame
+#   If someone knows how to do this better please tell me.
+artistData$first <- first$first[sapply(as.character(artistData$Artist), function(x) which(x == first$artist.name))]
+
+
 ggplot(artistData, aes(x = first)) +
   geom_density(adjust = 0.2)
 ```
@@ -250,6 +255,13 @@ Well I guess that's pretty much just when I was scrobbling lots, I added new art
 I guess it's nice to know I'm still discovering new music and now just listening to bands from my youth.
 
 
+When did I most listen to my favourite bands?
+----------------------------------------------
+
+
+
+Diversity of bands listened to
+--------------------------------
 
 
 
