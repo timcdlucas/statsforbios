@@ -143,7 +143,15 @@ ggplot(d, aes(x = time)) +
   geom_density(adjust = 0.1) 
 ```
 
-![plot of chunk times](figure/times.png) 
+![plot of chunk times](figure/times1.png) 
+
+```r
+# Another simple way to look at times
+#   Can't work out how to do this in ggplot2. 
+plot(d$time)
+```
+
+![plot of chunk times](figure/times2.png) 
 
 I've had some periods where my music player didn't support scrobbling and things like that. 
 Seems I also just listened to less music back in 2005/2006. 
@@ -187,7 +195,61 @@ table(d$timeOnly)[order(table(d$timeOnly), decreasing = TRUE)] %>% head
 ```
 
 It seems the spike is 10:20 (above is decimal I think). 
-I think this must be something server side as last.fm.
+I think this must be something server side at last.fm.
+
+
+
+When did I start listening to bands?
+-------------------------------------
+
+
+So first I'll look at a cumulative graph of number of bands in my 'library'.
+I expect there will be a quick ramp up (I already listened to plenty of bands before I started scrobbling).
+I'm not sure what else I might see.
+Perhaps a ramp up in about 2010.
+In particular I started listening to more electonic music and importantly more compilations at that time.
+
+
+
+```r
+artistData <- d %>% 
+  group_by(artist.name) %>% 
+  select(time) %>%
+  summarise(first = sort(time)[1])
+
+artistData %>% head
+```
+
+```
+## Source: local data frame [6 x 2]
+## 
+##            artist.name               first
+## 1               *shels 2007-11-01 14:36:20
+## 2                  +44 2012-04-27 15:32:33
+## 3              101/SiD 2006-01-17 22:49:38
+## 4 13th Floor Elevators 2014-07-03 15:17:43
+## 5                16bit 2010-10-27 12:43:01
+## 6          2 Many DJ's 2005-03-08 12:44:25
+```
+
+```r
+ggplot(artistData, aes(x = first)) +
+  geom_density(adjust = 0.2)
+```
+
+![plot of chunk bandsCumulative](figure/bandsCumulative1.png) 
+
+```r
+ggplot(artistData, aes(x = first)) + 
+  stat_ecdf()
+```
+
+![plot of chunk bandsCumulative](figure/bandsCumulative2.png) 
+
+Well I guess that's pretty much just when I was scrobbling lots, I added new artists. 
+I guess it's nice to know I'm still discovering new music and now just listening to bands from my youth.
+
+
 
 
 

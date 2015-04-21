@@ -97,7 +97,7 @@ When do I listen to music?
 ---------------------------
 
 
-```{r times}
+```{r times, cache = TRUE}
 
 # convert to POSIXct
 d$time <- ymd_hms(d$ISO.time)
@@ -106,6 +106,10 @@ d$time <- ymd_hms(d$ISO.time)
 # Through time
 ggplot(d, aes(x = time)) +
   geom_density(adjust = 0.1) 
+
+# Another simple way to look at times
+#   Can't work out how to do this in ggplot2. 
+plot(d$time)
 
 ```
 
@@ -144,7 +148,42 @@ table(d$timeOnly)[order(table(d$timeOnly), decreasing = TRUE)] %>% head
 ```
 
 It seems the spike is 10:20 (above is decimal I think). 
-I think this must be something server side as last.fm.
+I think this must be something server side at last.fm.
+
+
+
+When did I start listening to bands?
+-------------------------------------
+
+
+So first I'll look at a cumulative graph of number of bands in my 'library'.
+I expect there will be a quick ramp up (I already listened to plenty of bands before I started scrobbling).
+I'm not sure what else I might see.
+Perhaps a ramp up in about 2010.
+In particular I started listening to more electonic music and importantly more compilations at that time.
+
+
+```{r bandsCumulative}
+
+artistData <- d %>% 
+  group_by(artist.name) %>% 
+  select(time) %>%
+  summarise(first = sort(time)[1])
+
+artistData %>% head
+
+ggplot(artistData, aes(x = first)) +
+  geom_density(adjust = 0.2)
+
+ggplot(artistData, aes(x = first)) + 
+  stat_ecdf()
+
+```
+
+Well I guess that's pretty much just when I was scrobbling lots, I added new artists. 
+I guess it's nice to know I'm still discovering new music and now just listening to bands from my youth.
+
+
 
 
 
