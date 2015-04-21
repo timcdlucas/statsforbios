@@ -26,6 +26,7 @@ library(ggplot2)
 library(magrittr)
 library(dplyr)
 library(lubridate)
+library(RColorBrewer)
 
 theme_set(theme_minimal())
 ```
@@ -234,7 +235,7 @@ first %>% head
 
 ```r
 # Add this data to artistData data.frame
-#   If someone knows how to do this better please tell me.
+#   If someone knows how to do this better please tell me. (left_join?)
 artistData$first <- first$first[sapply(as.character(artistData$Artist), function(x) which(x == first$artist.name))]
 
 
@@ -259,12 +260,34 @@ When did I most listen to my favourite bands?
 ----------------------------------------------
 
 
+```r
+top <- artistData[order(artistData$Freq, decreasing = TRUE), ] %>% head(., 6)
+
+topScrobbles <- d %>%
+  filter(artist.name %in% top$Artist)
+
+topScrobbles$artist.factor <- factor(topScrobbles$artist.name)
+
+topScrobbles %<>% select(artist.factor, time)
+
+brks <- data.frame(interval = seq(min(topScrobbles$time), max(topScrobbles$time), by = '4 month'))
+
+ggplot(topScrobbles, aes(x = time, fill = artist.factor)) + 
+  geom_histogram(breaks = as.numeric(brks[,1]), position = 'fill') +
+  scale_fill_manual(values = brewer.pal(6, 'Set3'), name = "Artist") +
+  ylab('Proportion') +
+  xlab('')
+```
+
+```
+## Warning: position_fill requires constant width: output may be incorrect
+```
+
+![plot of chunk topArtists](figure/topArtists.png) 
+
+Meh. Still not a big fan of stacked bar chart type things. Mebbe I should try something else.
 
 Diversity of bands listened to
 --------------------------------
-
-
-
-
 
 
