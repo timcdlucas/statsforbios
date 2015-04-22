@@ -1,3 +1,11 @@
+---
+title: "Last.fm Data analysis"
+output:
+  html_document:
+    keep_md: true
+---
+
+
 Last.fm Data analysis
 =======================
 
@@ -28,7 +36,7 @@ library(lubridate)
 library(RColorBrewer)
 
 theme_set(theme_minimal())
-knit_theme$set("solarized-light")
+
 
 ```
 
@@ -296,15 +304,17 @@ artistData$urlencode <- sapply(artistData$Artist %>% as.character, URLencode)
 
 artistData$lastfmurl <- paste0('http://www.last.fm/music/', artistData$urlencode, '/+wiki')
 
-wikiData <- lapply(artistData$lastfmurl, function(x) try(html(x))) 
 
-save(wikiData, file = 'data/lastfmWebpages.RData')
+# This is very slow and probably pissing off last.fm. So save and load from now.
+ wikiData <- lapply(artistData$lastfmurl, function(x) try(html(x))) 
 
 ```
 
 ```{r foundedIn}
 
 # 62 out of ~2000 artists failed.
+
+
 
 sapply(wikiData, function(x) inherits(x, 'try-error')) %>% sum
 
@@ -345,7 +355,7 @@ extractLocation <- function(x){
 }
   
 
-artistData$locations <- sapply(wikiData, extractLocation)
+artistData$locations <- sapply(wikiData[1], extractLocation)
 
 sum(!is.na(artistData$locations))
 
@@ -437,6 +447,15 @@ leaflet() %>%
   addGeoJSON(shapes)
 
 ```
+
+
+This is awesome.
+However, it is confusing working out how to then share this map.
+You can find it here [http://timcdlucas.github.io/lastfm/testleaflet.html](http://timcdlucas.github.io/lastfm/testleaflet.html).
+And I guess at some point I'll work out how to auto update that.
+
+It looks like this.
+![A map of artists](figure/leafletmap.png)
 
 
 
