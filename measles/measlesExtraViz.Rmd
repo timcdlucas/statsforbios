@@ -41,7 +41,7 @@ Line chart
 
 First let's do the most basic line chart.
 
-```{r lines, fig.height = 7, fig.width = 10}
+```{r lines, fig.height = 6, fig.width = 12}
 
 plot(y[, 2] ~ y[, 1], type = 'l', 
   ylim = c(0, max(y, na.rm = TRUE)), 
@@ -62,7 +62,7 @@ Let's try some opacity.
 
 
 
-```{r linesOpac, fig.height = 7, fig.width = 10}
+```{r linesOpac, fig.height = 6, fig.width = 9}
 
 par(mar = c(3, 4.5, 1, 1))
 
@@ -81,7 +81,7 @@ for(s in 3:NCOL(y)){
   col = rgb(0, 0, 0, op))
 }
 
-segments(1963, 0, 1963, signif(max(y, na.rm = TRUE), 1), col = '#CD0000', lwd = 1.6, lty = 2)
+segments(1963, 0, 1963, signif(max(y, na.rm = TRUE), 1), col = '#CD0000', lwd = 1.7, lty = 2)
 
 ```
 

@@ -83,7 +83,7 @@ for(s in 3:NCOL(y)){
   col = rgb(0, 0, 0, op))
 }
 
-segments(1963, 0, 1963, signif(max(y, na.rm = TRUE), 1), col = '#CD0000', lwd = 1.6, lty = 2)
+segments(1963, 0, 1963, signif(max(y, na.rm = TRUE), 1), col = '#CD0000', lwd = 1.7, lty = 2)
 ```
 
 ![plot of chunk linesOpac](figure/linesOpac-1.png) 
