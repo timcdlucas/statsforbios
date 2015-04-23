@@ -2,7 +2,6 @@
 title: "Last.fm Data analysis"
 output:
   html_document:
-    keep_md: true
 ---
 
 
@@ -37,6 +36,7 @@ library(lubridate)
 library(RColorBrewer)
 
 theme_set(theme_minimal())
+knit_theme$set("solarized-light")
 ```
 
 Then read in the data.
@@ -364,11 +364,6 @@ Spelling mistakes in band names could accentuate this.
 
 
 
-Diversity of bands listened to
---------------------------------
-
-
-
 
 Where do bands come from
 ---------------------------
@@ -390,26 +385,8 @@ artistData$urlencode <- sapply(artistData$Artist %>% as.character, URLencode)
 artistData$lastfmurl <- paste0('http://www.last.fm/music/', artistData$urlencode, '/+wiki')
 
 
-# This is very slow and probably pissing off last.fm. So save and load from now.
- wikiData <- lapply(artistData$lastfmurl, function(x) try(html(x))) 
-
-# length(wikiData)
-
-htmlDoc <- htmlParse(wikiData2)
-
-saveXML(htmlDoc, file = 'data/lastfmWebpages2.txt')
-```
-
-```
-## [1] "data/lastfmWebpages2.txt"
-```
-
-```r
-doc<-htmlParse('data/lastfmWebpages2.txt')
-
-
-
-load('data/lastfmWebpages.RData')
+# This is very slow and probably pissing off last.fm. So save locations and load from now.
+# wikiData <- lapply(artistData$lastfmurl, function(x) try(html(x))) 
 ```
 
 
@@ -422,7 +399,7 @@ sapply(wikiData, function(x) inherits(x, 'try-error')) %>% sum
 ```
 
 ```
-## [1] 53
+## [1] 62
 ```
 
 ```r
@@ -462,38 +439,27 @@ extractLocation <- function(x){
 }
   
 
-artistData$locations <- sapply(wikiData[1], extractLocation)
-```
 
-```
-## Warning in xmlRoot.XMLInternalDocument(x, addFinalizer = FALSE): empty XML
-## document
-```
+# artistData$locations <- sapply(wikiData, extractLocation)
 
-```
-## Warning in xmlRoot.XMLInternalDocument(doc): empty XML document
-```
+load('data/artistData.RData')
 
-```
-## Error in UseMethod("xmlNamespaceDefinitions"): no applicable method for 'xmlNamespaceDefinitions' applied to an object of class "NULL"
-```
-
-```r
 sum(!is.na(artistData$locations))
 ```
 
 ```
-## Warning in is.na(artistData$locations): is.na() applied to non-(list or
-## vector) of type 'NULL'
+## [1] 862
 ```
 
-```
-## [1] 0
+```r
+# save(artistData, file = 'data/artistData.RData')
 ```
 
 Doing it like this, unfortunately we only find ~800 locations. 
 This is still awesome.
 But maybe I'll have a go at scrapping wikipedia at some point.
+One thing to note is that on last.fm, if multiple bands have the same name they share a page.
+So there is no location markup allowed for these bands.
 
 Right. Now to convert locations to latitude and longitude.
 
@@ -511,11 +477,11 @@ construct.geocode.url <- function(address, return.call = "json", sensor = "false
   return(URLencode(u))
 }
 
-gGeoCode <- function(address,verbose=FALSE) {
+gGeoCode <- function(address, verbose = FALSE) {
 
   if(is.na(address)){ return(c(NA, NA)) }
 
-  if(verbose) cat(address,"\n")
+  if(verbose) cat(address, "\n")
   u <- construct.geocode.url(address)
   doc <- getURL(u)
   x <- fromJSON(doc,simplify = FALSE)
@@ -524,12 +490,27 @@ gGeoCode <- function(address,verbose=FALSE) {
     lng <- x$results[[1]]$geometry$location$lng
     return(c(lat, lng))
   } else {
-    return(c(NA,NA))
+    return(c(NA, NA))
   }
 }
 
+# Run google geocode
 geo <- lapply(artistData$locations, gGeoCode) %>% do.call(rbind, .)
 
+head(geo)
+```
+
+```
+##          [,1]      [,2]
+## [1,]       NA        NA
+## [2,]       NA        NA
+## [3,] 30.26715 -97.74306
+## [4,]       NA        NA
+## [5,]       NA        NA
+## [6,]       NA        NA
+```
+
+```r
 colnames(geo) <- c('latitude', 'longitude')
 
 artistData <- cbind(artistData, geo)
@@ -569,56 +550,103 @@ for(i in 1:nrow(s)){
   colnames(shapes[[i]]$geometry$coordinates) <- NULL
   shapes[[i]]$properties$popup = as.character(s[i, 1])
 }
+
+# Commented because I can't work out how to output this properly yet.
+#leaflet() %>% 
+#  addTiles() %>%
+#  addGeoJSON(shapes)
+```
+
+
+This is awesome.
+However, it is confusing working out how to then share this map.
+You can find it here [http://timcdlucas.github.io/lastfm/testleaflet.html](http://timcdlucas.github.io/lastfm/testleaflet.html).
+And I guess at some point I'll work out how to auto update that.
+
+It looks like this.
+![A map of artists](figure/leafletmap.png)
+
+
+
+What devices?
+--------------
+
+Apparently last.fm stores which device I was using when I listened to track.
+I don't quite know what data they are storing.
+But some interesting questions might be whether I listen to different music on my phone compared to on my computer.
+
+
+```r
+table(d$application)
 ```
 
 ```
-## Error in `*tmp*`[[i]]: subscript out of bounds
+## 
+##                               Android Last.fm             Clementine 
+##                  66268                  17244                   7805 
+##            Grooveshark Last.fm Flash Clienttt                MUZU.TV 
+##                  13232                      7                      3 
+##     Spotify Web Player          YouTube Video 
+##                     10                      2
+```
+
+Ok. Most of the data is from an unknown application.
+However, given that Android seems to be working I would guess that nearly all the unknown stuff is from my computer.
+So I will compare `android last.fm` to everything else.
+
+
+```r
+phone <- d %>% 
+  filter(application == 'Android Last.fm') %>%
+  select(artist.name) %>%
+  table %>%
+  sort(decreasing = TRUE) %>%
+  head(n = 10)
+
+
+
+notPhone <- d %>% 
+  filter(application != 'Android Last.fm') %>%
+  select(artist.name) %>%
+  table %>%
+  sort(decreasing = TRUE) %>%
+  head(n = 10)
+
+phone
+```
+
+```
+## .
+##     Frank Turner     Van Morrison Four Year Strong  New Found Glory 
+##             1276             1034              648              496 
+##   Set Your Goals        Radiohead     Jack Johnson      John Martyn 
+##              449              447              405              380 
+## The Story So Far          Genesis 
+##              356              343
 ```
 
 ```r
-leaflet() %>% 
-  addTiles() %>%
-  addGeoJSON(shapes)
+notPhone
 ```
 
-<!--html_preserve--><div id="htmlwidget-2491" style="width:504px;height:504px;" class="leaflet"></div>
-<script type="application/json" data-for="htmlwidget-2491">{ "x": {
- "calls": [
- {
- "method": "tileLayer",
-"args": [
- "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-{
- "minZoom":                 0,
-"maxZoom":                18,
-"maxNativeZoom": null,
-"tileSize":               256,
-"subdomains": "abc",
-"errorTileUrl": "",
-"tms": false,
-"continuousWorld": false,
-"noWrap": false,
-"zoomOffset":                 0,
-"zoomReverse": false,
-"opacity":                 1,
-"zIndex": null,
-"unloadInvisibleTiles": null,
-"updateWhenIdle": null,
-"detectRetina": false,
-"reuseTiles": false,
-"attribution": "&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap</a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>" 
-} 
-] 
-},
-{
- "method": "geoJSON",
-"args": [
- [],
-null 
-] 
-} 
-] 
-},"evals": [  ] }</script><!--/html_preserve-->
+```
+## .
+##       Van Morrison          Radiohead        The Beatles 
+##               4673               2296               2256 
+##          Sigur Rós Coheed and Cambria       Frank Turner 
+##               1734               1690               1513 
+##   Four Year Strong               Blur             Mogwai 
+##                983                955                865 
+##    New Found Glory 
+##                850
+```
+
+
+Well... given that there's a bit of randomness and a bit of time bias (I got my first smart phone in about 2010) this is really quite similar.
+Boring.
+
+Diversity of bands listened to
+--------------------------------
 
 
 

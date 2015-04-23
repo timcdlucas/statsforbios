@@ -1,9 +1,4 @@
----
-title: "Last.fm Data analysis"
-output:
-  html_document:
-    keep_md: true
----
+
 
 
 Last.fm Data analysis
@@ -36,6 +31,7 @@ library(lubridate)
 library(RColorBrewer)
 
 theme_set(theme_minimal())
+knit_theme$set("solarized-light")
 
 
 ```
@@ -279,11 +275,6 @@ Spelling mistakes in band names could accentuate this.
 
 
 
-Diversity of bands listened to
---------------------------------
-
-
-
 
 Where do bands come from
 ---------------------------
@@ -305,8 +296,8 @@ artistData$urlencode <- sapply(artistData$Artist %>% as.character, URLencode)
 artistData$lastfmurl <- paste0('http://www.last.fm/music/', artistData$urlencode, '/+wiki')
 
 
-# This is very slow and probably pissing off last.fm. So save and load from now.
- wikiData <- lapply(artistData$lastfmurl, function(x) try(html(x))) 
+# This is very slow and probably pissing off last.fm. So save locations and load from now.
+# wikiData <- lapply(artistData$lastfmurl, function(x) try(html(x))) 
 
 ```
 
@@ -355,15 +346,22 @@ extractLocation <- function(x){
 }
   
 
-artistData$locations <- sapply(wikiData[1], extractLocation)
+
+# artistData$locations <- sapply(wikiData, extractLocation)
+
+load('data/artistData.RData')
 
 sum(!is.na(artistData$locations))
+
+# save(artistData, file = 'data/artistData.RData')
 
 ```
 
 Doing it like this, unfortunately we only find ~800 locations. 
 This is still awesome.
 But maybe I'll have a go at scrapping wikipedia at some point.
+One thing to note is that on last.fm, if multiple bands have the same name they share a page.
+So there is no location markup allowed for these bands.
 
 Right. Now to convert locations to latitude and longitude.
 
@@ -381,11 +379,11 @@ construct.geocode.url <- function(address, return.call = "json", sensor = "false
   return(URLencode(u))
 }
 
-gGeoCode <- function(address,verbose=FALSE) {
+gGeoCode <- function(address, verbose = FALSE) {
 
   if(is.na(address)){ return(c(NA, NA)) }
 
-  if(verbose) cat(address,"\n")
+  if(verbose) cat(address, "\n")
   u <- construct.geocode.url(address)
   doc <- getURL(u)
   x <- fromJSON(doc,simplify = FALSE)
@@ -394,11 +392,14 @@ gGeoCode <- function(address,verbose=FALSE) {
     lng <- x$results[[1]]$geometry$location$lng
     return(c(lat, lng))
   } else {
-    return(c(NA,NA))
+    return(c(NA, NA))
   }
 }
 
+# Run google geocode
 geo <- lapply(artistData$locations, gGeoCode) %>% do.call(rbind, .)
+
+head(geo)
 
 colnames(geo) <- c('latitude', 'longitude')
 
@@ -442,9 +443,10 @@ for(i in 1:nrow(s)){
   shapes[[i]]$properties$popup = as.character(s[i, 1])
 }
 
-leaflet() %>% 
-  addTiles() %>%
-  addGeoJSON(shapes)
+# Commented because I can't work out how to output this properly yet.
+#leaflet() %>% 
+#  addTiles() %>%
+#  addGeoJSON(shapes)
 
 ```
 
@@ -456,6 +458,54 @@ And I guess at some point I'll work out how to auto update that.
 
 It looks like this.
 ![A map of artists](figure/leafletmap.png)
+
+
+
+What devices?
+--------------
+
+Apparently last.fm stores which device I was using when I listened to track.
+I don't quite know what data they are storing.
+But some interesting questions might be whether I listen to different music on my phone compared to on my computer.
+
+```{r devices}
+
+table(d$application)
+```
+
+Ok. Most of the data is from an unknown application.
+However, given that Android seems to be working I would guess that nearly all the unknown stuff is from my computer.
+So I will compare `android last.fm` to everything else.
+
+```{r applicationAnalysis}
+
+phone <- d %>% 
+  filter(application == 'Android Last.fm') %>%
+  select(artist.name) %>%
+  table %>%
+  sort(decreasing = TRUE) %>%
+  head(n = 10)
+
+
+
+notPhone <- d %>% 
+  filter(application != 'Android Last.fm') %>%
+  select(artist.name) %>%
+  table %>%
+  sort(decreasing = TRUE) %>%
+  head(n = 10)
+
+phone
+notPhone
+
+```
+
+
+Well... given that there's a bit of randomness and a bit of time bias (I got my first smart phone in about 2010) this is really quite similar.
+Boring.
+
+Diversity of bands listened to
+--------------------------------
 
 
 
