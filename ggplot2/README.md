@@ -1,0 +1,1 @@
+See [http://htmlpreview.github.io/?https://github.com/timcdlucas/statsforbios/blob/master/ggplot2/allGeoms.html](http://htmlpreview.github.io/?https://github.com/timcdlucas/statsforbios/blob/master/ggplot2/allGeoms.html) for rendered figs and code.
