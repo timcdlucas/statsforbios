@@ -1,4 +1,5 @@
-data(cars)
+
+#+ dataRead
 
 library(ggplot2)
 library(magrittr)
@@ -41,6 +42,9 @@ names(p) <- c("Order", "Family",
 
 apply(p, 2, function(x) sum(is.na(x)))
 
+
+#+ plots
+
 theme_set(theme_grey() + theme(text = element_text(size = 22)))
 
 
@@ -52,7 +56,7 @@ ggsave('~/Dropbox/Documents/statsforbios/ggplot2/point.png')
 
 theme_set(theme_solarized_2() + theme(text = element_text(size = 22)))
 
-ggplot(p, aes(x = log(AdultHeadBodyLen_mm), y = AdultForearmLen_mm)) +
+ggplot(p, aes(x = log(AdultLen), y = AdultForearmLen_mm)) +
   geom_bin2d() +
   annotate('text', x = 4, y = 230, label = 'Data: Pantheria')
 ggsave('~/Dropbox/Documents/statsforbios/ggplot2/bin2d.png')
