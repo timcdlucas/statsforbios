@@ -4,8 +4,13 @@ setwd('~/Dropbox/Documents/statsforbios/biomass')
 library(dplyr)
 library(sqldf)
 
-pantheria <- read.table(file = '~/Dropbox/phd/Documents/thesis/data/Chapter3/PanTHERIA_1-0_WR05_Aug2008.txt',
+#pantheria <- read.table(file = '~/Dropbox/phd/Documents/thesis/data/Chapter3/PanTHERIA_1-0_WR05_Aug2008.txt',
   header = TRUE, sep = "\t", na.strings = c("-999", "-999.00"))
+
+URL <- "http://esapubs.org/archive/ecol/e090/184/PanTHERIA_1-0_WR05_Aug2008.txt"
+
+pantheria <- read.table(file=URL,header=TRUE,sep="\t",na.strings=c("-999","-999.00"))
+
 
 d <- read.csv('eventoedbiomass.csv', stringsAsFactors = FALSE)
 
