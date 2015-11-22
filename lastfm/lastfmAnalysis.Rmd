@@ -460,6 +460,13 @@ It looks like this.
 ![A map of artists](figure/leafletmap.png)
 
 
+### musicbrainz 
+
+I could use the musicbrainz database to augment this.
+The artist page is simply `paste0('https://musicbrainz.org/artist/', d$artist.mbid)`.
+
+
+
 
 What devices?
 --------------
@@ -506,6 +513,12 @@ Boring.
 
 Diversity of bands listened to
 --------------------------------
+
+
+
+
+Distribution of how many tracks per day
+----------------------------------------
 
 
 

@@ -39,9 +39,14 @@ ggplot(beavers, aes(x = elapsedHours, y = temp, colour = beaver, symbol = activ)
   ylab(expression('Temperature ('~degree~C~')')) +
   xlab('Hours since start') +
   scale_size_manual(values = c(0, 3), name = 'Activity', labels = c('', 'Active')) +
-  theme_fivethirtyeight(base_family = 'lato light')
+  theme_fivethirtyeight(base_family = 'Palatino') +
+  theme(axis.title.y = element_text(angle = 90),
+        axis.title.x = element_text(),
+        #axis.text = element_text(color = "grey", size = 11, family  =  "Lato Black"),
+        axis.title = element_text(size = 14))
 
 
+ggsave('imgs/beavers.png')
 
 
 

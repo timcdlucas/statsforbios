@@ -43,9 +43,6 @@ pantheria %>%
 
 dev.off()
 
-pantheria %>%
-  filter(MSW05_Order == 'Chiroptera') %>%
-  dplyr::select(MSW05_Order, X26.1_GR_Area_km2) %>%
-  filter(complete.cases(.)) %>% dim
+
 
 

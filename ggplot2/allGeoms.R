@@ -222,5 +222,11 @@ ggsave('~/Dropbox/Documents/statsforbios/ggplot2/geom_rect.png')
 
 
 
+p %>%
+  dplyr::filter(Genus == 'Gerbillus') %>%
+  dplyr::select(MinLat_dd, MaxLat_dd, MidRangeLat_dd, Binomial) %>%
+  ggplot(., aes(y = MidRangeLat_dd, ymin = MinLat_dd, ymax = MaxLat_dd, Binomial)) +
+    geom_pointrange()
+
 
 
