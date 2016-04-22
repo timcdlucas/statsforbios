@@ -3,6 +3,7 @@ library(ggplot2)
 library(tidyr)
 library(palettetown)
 
+source('https://raw.githubusercontent.com/timcdlucas/ggplotThemes/master/theme_tcdl.R')
 
 d <- data.frame(x = runif(100))
 
