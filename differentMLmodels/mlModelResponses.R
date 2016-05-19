@@ -3,6 +3,7 @@ library(tidyr)
 library(nnet)
 library(ggthemes)
 library(e1071)
+library(gbm)
 
 setwd('~/Dropbox/Documents/statsforbios/differentMLmodels')
 
@@ -70,5 +71,26 @@ ggplot(longdf, aes(x, Prediction, colour = Model)) +
   theme_dark() + theme(text = element_text(size = 30)) + ylab('y')
 
 ggsave('svm.png', dpi = 500)
+
+
+
+
+gbm10000 <- gbm(y ~ x, data = data.frame(x, y), distribution = 'gaussian', n.trees = 10000)
+gbm100.preds <- predict(gbm10000, newdata = newx, n.trees = 100, type = 'response')
+
+
+gbm1000.preds <- predict(gbm10000, newdata = newx, n.trees = 1000, type = 'response')
+gbm10000.preds <- predict(gbm10000, newdata = newx, n.trees = 10000, type = 'response')
+
+
+df.out <- cbind(newx, gbm100 = gbm100.preds, gbm1000 = gbm1000.preds, gbm10000 = gbm10000.preds)
+
+longdf <- gather(df.out, Model, Prediction, -x)
+
+
+ggplot(longdf, aes(x, Prediction, colour = Model)) + 
+  geom_point(data = df, aes(x, y), colour = 'black', alpha = 0.4) +
+  geom_line(size = 1.3)   +
+  theme_few() + theme(text = element_text(size = 30)) + ylab('y')
 
 
