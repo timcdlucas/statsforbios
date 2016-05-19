@@ -4,6 +4,8 @@ library(nnet)
 library(ggthemes)
 library(e1071)
 library(gbm)
+library(segmented)
+library(palettetown)
 
 setwd('~/Dropbox/Documents/statsforbios/differentMLmodels')
 
@@ -77,13 +79,24 @@ ggsave('svm.png', dpi = 500)
 
 gbm10000 <- gbm(y ~ x, data = data.frame(x, y), distribution = 'gaussian', n.trees = 10000)
 gbm100.preds <- predict(gbm10000, newdata = newx, n.trees = 100, type = 'response')
-
-
 gbm1000.preds <- predict(gbm10000, newdata = newx, n.trees = 1000, type = 'response')
 gbm10000.preds <- predict(gbm10000, newdata = newx, n.trees = 10000, type = 'response')
 
 
-df.out <- cbind(newx, gbm100 = gbm100.preds, gbm1000 = gbm1000.preds, gbm10000 = gbm10000.preds)
+gbmlap10000 <- gbm(y ~ x, data = data.frame(x, y), distribution = 'laplace', n.trees = 10000)
+gbmlap1000.preds <- predict(gbmlap10000, newdata = newx, n.trees = 1000, type = 'response')
+
+gbmt10000 <- gbm(y ~ x, data = data.frame(x, y), distribution = 'tdist', n.trees = 10000)
+gbmt1000.preds <- predict(gbmt10000, newdata = newx, n.trees = 1000, type = 'response')
+
+gbmt810000 <- gbm(y ~ x, data = data.frame(x, y), distribution = list(name = 'tdist', df = 8), n.trees = 10000)
+gbmt81000.preds <- predict(gbmt810000, newdata = newx, n.trees = 1000, type = 'response')
+
+
+df.out <- cbind(newx, gaus100 = gbm100.preds, gaus1000 = gbm1000.preds, gaus10000 = gbm10000.preds, 
+                laplace1000 = gbmlap1000.preds,
+                tdist4.1000 = gbmt1000.preds,
+                tdist8.1000 = gbmt81000.preds)
 
 longdf <- gather(df.out, Model, Prediction, -x)
 
@@ -91,6 +104,49 @@ longdf <- gather(df.out, Model, Prediction, -x)
 ggplot(longdf, aes(x, Prediction, colour = Model)) + 
   geom_point(data = df, aes(x, y), colour = 'black', alpha = 0.4) +
   geom_line(size = 1.3)   +
-  theme_few() + theme(text = element_text(size = 30)) + ylab('y')
+  theme_few() + theme(text = element_text(size = 30)) + ylab('y') +
+  scale_colour_hc()
+
+ggsave('gbm.png', dpi = 500)
+
+
+
+
+
+xylm <- lm(y ~ x, data = data.frame(x, y))
+
+seg2 <- segmented(xylm, seg.Z = ~x, psi = 2)
+seg2.preds <- predict(seg2, newx)
+
+
+seg3 <- segmented(xylm, seg.Z = ~x, psi = c(-1, 1, 2))
+seg3.preds <- predict(seg3, newx)
+
+
+seg8 <- segmented(xylm, seg.Z = ~x, psi = c(-4, -3, -2, -1, 1, 2, 3, 5))
+seg8.preds <- predict(seg8, newx)
+
+
+
+
+
+
+
+df.out <- cbind(newx, seg2 = seg2.preds,  seg3 = seg3.preds,  seg8 = seg8.preds)
+
+longdf <- gather(df.out, Model, Prediction, -x)
+
+
+ggplot(longdf, aes(x, Prediction, colour = Model)) + 
+  geom_point(data = df, aes(x, y), colour = 'black', alpha = 0.4) +
+  geom_line(size = 1.3)   +
+  theme_solarized() + theme(text = element_text(size = 30)) + ylab('y') +
+  scale_colour_poke(pokemon = 'charizard', spread = 3)
+ggsave('seg.png', dpi = 500)
+
+
+
+
+
 
 
