@@ -6,9 +6,12 @@ library(e1071)
 library(gbm)
 library(segmented)
 library(palettetown)
+library(kernlab)
 
 setwd('~/Dropbox/Documents/statsforbios/differentMLmodels')
 
+# I set this after posting the first few figs...
+set.seed(200)
 x = runif(1000, -10, 10)
 y = rnorm(1000, sd = 50) + x^3 
 
@@ -143,6 +146,45 @@ ggplot(longdf, aes(x, Prediction, colour = Model)) +
   theme_solarized() + theme(text = element_text(size = 30)) + ylab('y') +
   scale_colour_poke(pokemon = 'charizard', spread = 3)
 ggsave('seg.png', dpi = 500)
+
+
+
+
+
+
+####################################################################
+### Gaussian process                                            ####
+####################################################################
+
+
+
+
+gp0.1 <- gausspr(x, y, kernel="rbfdot", type = 'regression', kpar = list(sigma = 0.1))
+gp0.1.preds <- predict(gp0.1, newx)
+
+
+gp0.001 <- gausspr(x, y, kernel="rbfdot", type = 'regression', kpar = list(sigma = 0.001))
+gp0.001.preds <- predict(gp0.001, newx)
+
+
+
+
+df.out <- cbind(newx, gp0.1 = gp0.1.preds, gp0.001 = gp0.001.preds)
+
+longdf <- gather(df.out, Model, Prediction, -x)
+
+
+ggplot(longdf, aes(x, Prediction, colour = Model)) + 
+  geom_point(data = df, aes(x, y), colour = 'black', alpha = 0.4) +
+  geom_line(size = 1.3)   +
+  theme_solarized() + theme(text = element_text(size = 30)) + ylab('y') +
+  scale_colour_poke(pokemon = 'charizard', spread = 3)
+
+
+ggsave('seg.png', dpi = 500)
+
+
+
 
 
 
