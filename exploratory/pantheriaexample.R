@@ -55,7 +55,7 @@ anova(hypmodel) # Who woulda thought... it's significant.
 
 # Just as a comparison, what sort of power do we get if we don't do the exploratory bit first.
 # There is in fact 0 rows with complete cases... 
-# So we're going to have to reduce the variables we look at anyway... and still only get 26 data points.
+# So we're going to have to reduce the variables we look at anyway... 
 
 model_poor <- pantheria %>%
                 select(11, 28, 7, 31, 21, 32, 14, 9, 6) %>%
