@@ -1,4 +1,3 @@
-setwd('E://tim/Dropbox/phd/Documents/thesis/')
 
 library(dplyr)
 library(magrittr)
@@ -6,6 +5,7 @@ library(ggplot2)
 library(rpart)
 
 
+# can download from http://esapubs.org/Archive/ecol/E090/184/PanTHERIA_1-0_WR05_Aug2008.txt
 pantheria <- read.table(file = 'data/Chapter3/PanTHERIA_1-0_WR05_Aug2008.txt',
                         header = TRUE, sep = "\t", na.strings = c("-999", "-999.00"))
 
