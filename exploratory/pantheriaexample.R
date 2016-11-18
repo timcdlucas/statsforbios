@@ -51,7 +51,20 @@ panHyp <- pantheria[-explore, ]
 hypmodel <- lm(X3.1_AgeatFirstBirth_d ~ X23.1_SexualMaturityAge_d, panHyp)
 anova(hypmodel) # Who woulda thought... it's significant.
                  
-                 
-                 
+
+
+# Just as a comparison, what sort of power do we get if we don't do the exploratory bit first.
+# There is in fact 0 rows with complete cases... 
+# So we're going to have to reduce the variables we look at anyway... and still only get 26 data points.
+
+model_poor <- pantheria %>%
+                select(11, 28, 7, 31, 21, 32, 14, 9, 6) %>%
+                #mutate_all(funs(sqrt, log)) %>% 
+                #mutate(X3.1_AgeatFirstBirth_d = Y) %>%
+                lm(X3.1_AgeatFirstBirth_d ~ ., data = .)
+anova(model_poor)
+
+# In this cases... we get exactly the same result.... oh well.
+
                  
                  
