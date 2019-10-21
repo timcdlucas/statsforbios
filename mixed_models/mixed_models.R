@@ -380,20 +380,49 @@ ggplot(dmean, aes(x = country, y = log_pr, colour = n < 10)) +
   ggtitle('Log malaria prevalence by country in 2000-2004 (pooling priors)')
 
 
+
+#' We can look at the prior and posterior for the hyperparameter that governs the strength of the prior.
+#' We can look at this on the internal precision scale used by INLA.
+#' We said that the prior probability that the precision is *less* that 3.1 is 1%.
+#' On the sd scale we said the prior probability that the sd is *greater* than o.1 is 1%.
+#' I've plotted these in red lines. They don't seem quite right but at least on the right side.
+#' 
+#' I'm also not 100% sure that my scaling here is correct. The posterior (black) looks very wide and high.
+
 #+ model_plots
+
+# These plots mess up knitr...
 #plot(mm1, plot.lincomb = FALSE, plot.random.effects = TRUE,
 #    plot.fixed.effects = FALSE, plot.predictor = FALSE,
 #    plot.prior = TRUE)
 #abline(v = 10, col = 'red')
 
+
+# Plot the posterior on precision scale
 plot(mm1$marginals.hyperpar$`Precision for country`, type="l", xlim=c(0, 80))
+
+# Plot the prior then add posterior
+kappa <- exp(seq(-5, 15, len=10000))
+prior.new = inla.pc.dprec(kappa, 0.1, 0.01)
+
+plot(kappa, prior.new, col = 'blue', type = 'l', xlim = c(0, 200), ylim = c(0, 0.002))
+lines(mm1$marginals.hyperpar$`Precision for country`)
 abline(v = 3.1, col = 'red')
 
+
+# Plot the posterior on sd scale
 sd_scale <- mm1$marginals.hyperpar$`Precision for country`
 sd_scale[, 'x'] <- 1/sqrt(sd_scale[, 'x'])
 
 plot(sd_scale, type="l", xlim=c(0, 1))
+
+
+# Plot prior on sd scale.
+plot(1/sqrt(kappa), prior.new, col = 'blue', type = 'l', xlim = c(0, 1), ylim = c(0, 0.002))
+lines(sd_scale)
 abline(v = 0.1, col = 'red')
+
+
 
 #'## Bit more on priors
 #' Between working out what scale you're using (variance, sd or precision) 
@@ -485,8 +514,8 @@ ggplot(dtime, aes(x = year_start, y = log_pr)) +
 
 #' We could instead estimate a seperate intercept for each model
 #' but still only one slope. As above we would want this intercept
-#' to be a random effect.
-#' #' $$ y =  \beta_0 + \beta_1 year + \beta_2.AFG + \beta_3.KHM + \beta_4.CHN + ... $$
+#' to be a random effect but for now it isn't.
+#' $$ y =  \beta_0 + \beta_1 year + \beta_2.AFG + \beta_3.KHM + \beta_4.CHN + ... $$
 
 #+ m4, fig.height = 10
 m4 <- lm(log_pr ~ year_start + country, data = dtime)
@@ -498,7 +527,7 @@ ggplot(dtime, aes(x = year_start, y = log_pr)) +
   geom_point(alpha = 0.4) +
   facet_wrap(~ country, ncol = 3) +
   geom_line(data = pred4  , aes(y = pred)) +
-  ggtitle('Log malaria prevalence by country through time')
+  ggtitle('Log malaria prevalence. Seperate intercepts, one slope.')
 
 
 #' Or we could estimate one slope and one intercept for each country as
@@ -523,7 +552,7 @@ ggplot(dtime, aes(x = year_start, y = log_pr)) +
   geom_point(alpha = 0.4) +
   facet_wrap(~ country, ncol = 3, scale = 'free_y') +
   geom_line(data = pred5, aes(y = pred)) +
-  ggtitle('Log malaria prevalence by country through time')
+  ggtitle('Log malaria prevalence. Seperate intercepts and slopes.')
 
 
 #' But the estimates in countries like Timor Leste are not very good. I don't believe malaria 
@@ -564,7 +593,7 @@ ggplot(dtime, aes(x = year_start, y = log_pr)) +
   geom_line(data = pred5, aes(y = pred), alpha = 0.3) +
   #geom_line(data = pred3, aes(y = pred), colour = 'blue', alpha = 0.3) +
   geom_line(data = predb3, aes(y = pred)) +
-  ggtitle('Log malaria prevalence by country through time') +
+  ggtitle('Log malaria prevalence. Pooling priors') +
   ylim(-3, -0.5)
 
 #' So as above, these priors have pushed both the slopes and intercepts to be much closer to the global mean.
@@ -615,7 +644,7 @@ ggplot(dtime, aes(x = year_start, y = log_pr)) +
   facet_wrap(~ country, ncol = 3, scale = 'fixed') +
   geom_line(data = pred5, aes(y = pred), alpha = 0.3) +
   geom_line(data = predmm2, aes(y = pred)) +
-  ggtitle('Log malaria prevalence by country through time. Random slopes') +
+  ggtitle('Log malaria prevalence by country through time. Random intercepts and slopes') +
   ylim(-3, -0.5)
 
 
@@ -634,8 +663,31 @@ mm2$summary.hyperpar
 #' Therefore the crazy slope in Timor-Leste is totaly unjustified.
 #'
 
-
-
+#' # Recap and practical advice
+#' 
+#' So, we have fitted a model for prevalence and a model for prevalence through time.
+#' In both cases we have many countries, and therefore many parameters.
+#' We want to put priors on these many parameters but don't know how strong to make them.
+#' So we use a mixed-effect model to put a hyperprior on the prior.
+#' 
+#' These parameters can be intercepts or regression slopes. Everything works
+#' the same way but this can be confusing in the programming syntax. This
+#' is what we refer to as random intercepts and random slopes models.
+#' 
+#' So when are these models suitable? Given that the sole thing they do
+#' is change the estimates of these many parameters, we should focus on
+#' whether that makes sense in a particular case.
+#' 
+#' 1. We need to estimate $\sigma$, the between group variance. We therefore
+#' need many groups for this estimate to be any good. The number of countries
+#' we have here is on the lower side.
+#' 2. If each group has loads of data, the prior will be ignored. So the benefit
+#' of mixed-effects models is reduced if every group has lots of data.
+#' 3. These models can be used for different reasons. Perhaps we are estimating
+#' some global fixed effect but want to account for autocorrelation. Perhaps
+#' we are interested in the individual group estimates, but want to share information
+#' between groups.
+#'
 
 #' # Frequentist mixed models.
 #' 
