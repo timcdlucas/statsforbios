@@ -18,10 +18,40 @@ knitr::opts_chunk$set(cache = TRUE, fig.width = 8, fig.height = 5)
 
 set.seed(191016)
 
+#install.packages("INLA", repos=c(getOption("repos"), INLA="https://inla.r-inla-download.org/R/stable"), dep=TRUE)
+
 library(dplyr)
 library(ggplot2)
 library(INLA)
 library(malariaAtlas)
+
+
+
+#' # Intro
+#' 
+#' This primer is an introduction to mixed effects models.
+#' I'm presenting it by using Bayesian mixed-effects models
+#' but that's because they are easier to understand.
+#' The hope is that from here it will be relatively easy to 
+#' understand frequentist mixed-effects models.
+#' Or at least, have the intuition of what the models are doing.
+#' I still don't understand the nuts and bolts of frequentist
+#' mixed-effects models.
+#' 
+#' The aim of the primer is to explain the real fundementals
+#' of what mixed effects-models are, why you might use them
+#' and *how* they do what they do. 
+#' This last bit (the how), is what is missed from many courses
+#' because the how in frequentist mixed-effects models is complicated.
+#' However, in Bayesian mixed-effects models, the how is very simple,
+#' and follows on entirely smoothly from any other Bayesian analysis.
+#' In this case, I think understanding how they work also makes the 
+#' what and the why easier to understand.
+#' 
+#' As an overview, we will look at some data and define some mathematical
+#' models to answer some questions of interest. Then we will fit those same
+#' models in a least squares framework, a normal Bayesian framework and finally
+#' a mixed-effect framework.
 
 
 #+ echo = FALSE, cache= FALSE, message = FALSE
@@ -142,24 +172,31 @@ ggplot(dmean, aes(x = country, y = log_pr)) +
 #' As our aim is actually to estimate the mean malaria prevalence for each country, we
 #' need country to go in as a categorical variable.
 #'
-#'$$y = \beta.country$$
+#'$$y =  \beta_0 + \beta.country$$
 #'
 #' It may be helpful to think about this in the explicit way it is encoded.
-#' We have 13 countries. So this model is infact 1 global mean and 12 country
+#' We have 13 countries. The ideal model would be 1 global mean and 13 country
 #' specific parameters.
 #'
 #'$$y = \beta_0 + \beta_1.AFG + \beta_2.KHM + \beta_3.CHN + ... $$
 #'
 #' (I'm using ISO3 codes here. KHM is Cambodia or Khmer)
-#' Internally, R converts the 1 categorical variable into 12 binary variables.
-#' Variable 1 is "is this row in AFG", variable 2 is "is this row in KHM" etc.
+#' Internally, R converts the 1 categorical variable into binary variables.
+#' Variable 1 is "is this row in AFG?", variable 2 is "is this row in KHM?" etc.
 #'
 #' So as these variables have a 1 if the row is in a given country and a zero 
 #' otherwise, a prediction for Afghanistan will be zeroes for all the terms
 #' except $\beta_0$ and $\beta_1$.
 #'
-#' All that is basically to say that for 12 countries you end up estimating 11
-#' parameters plus the global intercept.
+#' Unfortunately we now have to make a quick detour.
+#' This parameterisation is unidentifiable (the data cannot tell us
+#' the answer because there are multiple answers that fit the data equally likely).
+#' If we think about the same model with just two countries, how could the model know
+#' whether the intercept is high or both country-level parameters are high?
+#' When we switch to mixed-effects models we will have a global intercept and 13 country
+#' specific parameters. But for now we will have a global intercept and 12 country level 
+#' parameters. The first country is taken as the "reference class" and combined with
+#' the global intercept. Mostly, we can think about the models in the same way however.
 #'
 #' So now we can estimate this model with least squares
 
@@ -182,6 +219,16 @@ ggplot(dmean, aes(x = country, y = log_pr, colour = n < 10)) +
 #' Bayesian mixed modelling is essentially taking the above model structures and 
 #' doing clever things with priors. First we'll do more standard things with priors to
 #' remind ourselves what they mean.
+#'
+#' A prior is how we tell the model what is plausible based on our knowledge before 
+#' looking at the data. The intercept in our model is the average malaria prevalence
+#' across Asia (in log space). Is prevalence of 1 (in prevalence space) reasonable?
+#' No! So our prior should tell the model that this is very unlikely.
+#'
+#' So first let's fit our model in a Bayesian framework with INLA. The priors on
+#' fixed effects here are normal distributions with a mean and precision (1/sqrt(sd)).
+#' As our first model we are putting very wide priors on the parameters which should
+#' give us mode estimates very similar to the least squares estimate.
 
 
 #+ data_join
