@@ -166,7 +166,7 @@ coefficients(m1)
 ggplot(dmean, aes(x = country, y = log_pr)) + 
   geom_boxplot() +
   geom_point() +
-  ggtitle('Log malaria prevalence by country in 2000-2004') +
+  ggtitle('Log malaria prevalence and Asia global mean') +
   geom_abline(slope = 0, intercept = m1$coef[1])
 
 #' As our aim is actually to estimate the mean malaria prevalence for each country, we
@@ -211,7 +211,7 @@ ggplot(dmean, aes(x = country, y = log_pr, colour = n < 10)) +
   geom_boxplot() +
   geom_point() +
   geom_point(data = pred2, aes(country, pred), colour = 'black', size = 4) +
-  ggtitle('Log malaria prevalence by country in 2000-2004')
+  ggtitle('Log malaria prevalence and country specific means')
 
 
 
@@ -227,13 +227,22 @@ ggplot(dmean, aes(x = country, y = log_pr, colour = n < 10)) +
 #'
 #' So first let's fit our model in a Bayesian framework with INLA. The priors on
 #' fixed effects here are normal distributions with a mean and precision (1/sqrt(sd)).
-#' As our first model we are putting very wide priors on the parameters which should
-#' give us mode estimates very similar to the least squares estimate.
-
+#' For our first model we are putting very wide priors on the parameters which should
+#' give us parameter estimates very similar to the least squares estimate.
+#'
+#' In the first model, the global intercept was dominated by countries with lots of data like Indonesia.
+#' These data aren't independant because we expect the data within Indonesia to be more similar than
+#' the data between Indonesia and other countries. 
+#' If we were independantly sampling each person in Asia, China and India would have a lot more data
+#' than Cambodia!
+#' When people talk about autocorrelation in the data and mixed-models this is what they are referring
+#' to. 
+#' While removing this autocorrelation is good, most of the statistical power 
+#' will go into learning country level intercepts, not the global mean.
 
 #+ data_join
 
-# easiest way to predict with INLA is to put the data in with NAs in the Y column.
+# easiest way to predict with INLA is to put the prediction data in with NAs in the Y column.
 
 dmean_both <- bind_rows(dmean, dmean_pred)
 
@@ -257,13 +266,21 @@ ggplot(dmean, aes(x = country, y = log_pr, colour = n < 10)) +
   geom_boxplot() +
   geom_point() +
   geom_point(data = predb1, aes(country, pred), colour = 'black', size = 4) +
-  ggtitle('Log malaria prevalence by country in 2000-2004')
+  ggtitle('Log malaria prevalence. Bayesian means with vague priors.')
 
 
 #' Now let's say that we think all countries are fairly similar.
 #' To encode that in the prior we say that the $\beta_i$'s should be small.
 #' INLA works with precision (1/variance) so high precision is a tight prior around 0.
+#' 
+#' This is "pooling". Our estimates for countries with no much data will be helped
+#' by information from the other countries.
+#' 
+#' Our estimates for the global mean will be dominated by countries
+#' with lots of data. But we won't have put all our statistical power into learning
+#' the country level parameters.
 
+#+ bayes_strong
 
 priors <- list(mean.intercept = -2, prec.intercept = 1e-4, 
                mean = 0, prec = 100)
@@ -280,7 +297,8 @@ ggplot(dmean, aes(x = country, y = log_pr, colour = n < 10)) +
   geom_point() +
   geom_point(data = predb1, aes(country, pred), colour = 'black', size = 4, alpha = 0.3) +
   geom_point(data = predb2, aes(country, pred), colour = 'black', size = 4) +
-  ggtitle('Log malaria prevalence by country in 2000-2004 (pooling priors)')
+  ggtitle('Log malaria prevalence. Strong, pooling priors.') +
+  labs(subtitle = 'Least squares estimates in grey. Estimates pulled towards global mean.')
 
 
 
@@ -293,11 +311,9 @@ ggplot(dmean, aes(x = country, y = log_pr, colour = n < 10)) +
 #' 
 #' If we think that countries are quite dissimilar, we should put a weak prior on the country
 #' level parameters. For countries with little data, our estimates will be noisey, but maybe that's
-#' better than them being horribly biased towards the mean. Our global estimate won't be dominated by any
-#' one country. When people talk about autocorrelation in the data and mixed-models this is what they are referring
-#' to. These data aren't independant because we expect the data within Indonesia to be more similar than the data
-#' between Indonesia and other countries. While removing this autocorrelation is good most of the statistical power 
-#' will go into learning country level intercepts, not the global mean.
+#' better than them being biased towards the mean. Our global estimate won't be dominated by any
+#' one country. 
+#' 
 #' 
 #' The problem then is *how similar are countries*. Often, we don't know. So how do we set 
 #' our priors sensibly. The answer is mixed-effects models.
@@ -317,27 +333,27 @@ ggplot(dmean, aes(x = country, y = log_pr, colour = n < 10)) +
 #' To do this, we switch the 0.001 for a new variable, $\sigma$ and put a prior on sigma.
 #'$$y = \beta_0 + \beta_1.AFG + \beta_2.KHM + \beta_3.CHN + ... $$
 #'$$\beta_0 \sim Norm(-2, 10000)$$
-#'$$\beta_i \sim Norm(0, \mu)$$
-#'$$\mu \sim \text{some prior distribution}$$
+#'$$\beta_i \sim Norm(0, \sigma)$$
+#'$$\sigma \sim \text{some prior distribution}$$
 #' Mixed-effects models are also called hierarchical models for this reason, 
 #' the prior on the prior is hierarchical.
 #'
 #' So, now if the countries that do have lots of data are very different from each other, the
-#' model will learn that $\mu$ must be quite big. Therefore the countries
+#' model will learn that $\sigma$ must be quite big. Therefore the countries
 #' with little data will not be pulled towards the mean much. If the countries
 #' with lots of data are very similar, then a country with little data should
 #' be pulled towards the mean. If the few data points lie far from the global
 #' mean then probably it's just by chance.
 #' 
-#' Setting hyperpriors can be awkward. Note that $\mu$ must be positive so we
+#' Setting hyperpriors can be awkward. Note that $\sigma$ must be positive so we
 #' need a prior that reflects that.
 #' 
 #' Recently Penalised complexity priors have been developed and they are much more 
-#' intuitive. You choose a "tail value": What is the largest value of $\mu$ that is
-#' reasonable? You then tell the model that the probability that $\mu$ is greater than
+#' intuitive. You choose a "tail value": What is the largest value of $\sigma$ that is
+#' reasonable? You then tell the model that the probability that $\sigma$ is greater than
 #' that value is a small probability (1% or something).
 #' 
-#' So for now we'll say $P(\mu > 0.1) = 1\%$.
+#' So for now we'll say $P(\sigma > 0.1) = 1\%$.
 #' 
 
 
@@ -560,10 +576,10 @@ ggplot(dtime, aes(x = year_start, y = log_pr)) +
 #'As before we have a model:
 #' $$ y =  \beta_0 + \beta_1 year + \beta_2.AFG + \beta_3.KHM + \beta_4.CHN + ... + \beta_5.AFG.year + \beta_6.KHM.year + \beta_7.CHN.year + ...$$
 #' And we have priors that we don't know how strong they should be.
-#'$$\beta_{3-4} \sim Norm(0, \mu_{intercept})$$
-#'$$\mu_{intercept} \sim \text{some prior distribution}$$
-#'$$\beta_{5-7} \sim Norm(0, \mu_{slope})$$
-#'$$\mu_{slope} \sim \text{some prior distribution}$$
+#'$$\beta_{3-4} \sim Norm(0, \sigma_{intercept})$$
+#'$$\sigma_{intercept} \sim \text{some prior distribution}$$
+#'$$\beta_{5-7} \sim Norm(0, \sigma_{slope})$$
+#'$$\sigma_{slope} \sim \text{some prior distribution}$$
 #'
 #'And as above we can use penalised complexity priors.
 
